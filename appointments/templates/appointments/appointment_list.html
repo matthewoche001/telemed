@@ -1,0 +1,63 @@
+{% extends 'base.html' %} {% block title %}Appointments - OHMS{% endblock %} {% block page_title %}My Appointments{% endblock %} {% block content %}
+<div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;'>
+    <h2>Appointment Schedule</h2>
+    {% if user.role == 'patient' %} <a href='{% url "appointments:book_appointment" %}' class='btn btn-primary'>+ Book Appointment</a>
+    {% endif %}
+</div>
+
+<div class='card' style='padding: 0;'>
+    <div style='display: flex; border-bottom: 1px solid var(--border-color); background: #f8f9fa;'>
+        <button class='tab-btn active' onclick='filterAppointments("all")'>All</button>
+        <button class='tab-btn' onclick='filterAppointments("pending")'>Pending</button>
+        <button class='tab-btn' onclick='filterAppointments("confirmed")'>Confirmed</button>
+        <button class='tab-btn' onclick='filterAppointments("completed")'>Completed</button>
+    </div>
+
+    <table id='appointmentTable'>
+        <thead>
+            <tr>
+                <th>Date & Time</th>
+                {% if user.role != 'patient' %}<th>Patient</th>{% endif %} {% if user.role != 'doctor' %}<th>Doctor</th>{% endif %}
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appt in appointments %} <tr class='appt-row' data-status='{{ appt.status }}'> <td><strong>{{ appt.scheduled_at|date:"M d, Y" }}</strong> <br><small>{{ appt.scheduled_at|date:"H:i" }}</small></td> {% if user.role != 'patient' %}<td>{{ appt.patient.get_full_name|default:appt.patient.username }}</td>{% endif %} {% if user.role != 'doctor' %}<td>Dr. {{ appt.doctor.get_full_name|default:appt.doctor.username }}</td>{% endif %}
+                <td>
+                    {% if appt.status == 'pending' %}<span class='badge badge-pending'>Pending</span> {% elif appt.status == 'confirmed' %}<span class='badge badge-confirmed'>Confirmed</span>
+                    {% elif appt.status == 'completed' %}<span class='badge' style='background:var(--secondary-color); color:#fff;'>Completed</span> {% else %}<span class='badge' style='background:var(--danger); color:#fff;'>{{ appt.status|capfirst }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href='{% url "appointments:appointment_detail" appt.pk %}' class='btn' style='padding: 5px 12px; background: #e9ecef; font-size: 0.8rem;'>Details</a> {% if user.role == 'doctor' and appt.status == 'confirmed' %}
+                    <a href='{% url "consultations:start_consultation" appt.pk %}' class='btn btn-success' style='padding: 5px 12px; font-size: 0.8rem;'>Start Session</a> {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan='5' style='text-align: center;'>No appointments found in this category.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .tab-btn { border: none; background: none; padding: 15px 25px; cursor: pointer; font-weight: 500; color: var(--secondary-color); border-bottom: 2px solid transparent; }
+    .tab-btn.active { color: var(--primary-color); border-bottom: 2px solid var(--primary-color); background: var(--white); }
+</style>
+
+<script>
+    function filterAppointments(status) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        if (event) event.target.classList.add('active');
+        const rows = document.querySelectorAll('.appt-row');
+        rows.forEach(row => {
+            if (status === 'all' || row.getAttribute('data-status') === status) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}

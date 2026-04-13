@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Lab Dashboard - OHMS{% endblock %}
+{% block page_title %}Imaging & Laboratory{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>Laboratory Technician Dashboard</h2>
+    <p>Manage diagnostic scans and laboratory imaging workflows.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+    <div class="card">
+        <h3>New Scan Upload</h3>
+        <p>Process CT scans and trigger AI preprocessing.</p>
+        <a href="{% url 'diagnostics:upload_scan' %}" class="btn btn-primary">Upload DICOM/PNG</a>
+    </div>
+    <div class="card">
+        <h3>Recent Scans</h3>
+        <p>Monitor status of uploaded imaging.</p>
+        <a href="{% url 'diagnostics:scan_list' %}" class="btn btn-secondary">Scan Workspace</a>
+    </div>
+</div>
+{% endblock %}

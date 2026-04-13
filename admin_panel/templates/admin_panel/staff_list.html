@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Manage Staff - OHMS{% endblock %}
+{% block page_title %}Medical & Support Personnel{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <h3>Hospital Staff Registry</h3>
+        <a href="{% url 'admin_panel:staff_add' %}" class="btn btn-primary">+ Register Staff</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Full Name</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in staff %}
+            <tr>
+                <td>{{ s.username }}</td>
+                <td>{{ s.get_full_name }}</td>
+                <td><span class="badge" style="background:#e7f3ff; color:var(--primary-color);">{{ s.get_role_display }}</span></td>
+                <td>
+                    {% if s.is_active %}<span class="badge" style="background:var(--success); color:#fff;">Active</span>
+                    {% else %}<span class="badge" style="background:var(--danger); color:#fff;">Inactive</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'admin_panel:staff_edit' s.pk %}" class="btn" style="background:#e9ecef; padding: 5px 12px; font-size: 0.85rem;">Edit</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

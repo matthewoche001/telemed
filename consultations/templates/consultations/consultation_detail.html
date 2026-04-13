@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Consultation - #{{ consultation.id }}{% endblock %}
+{% block page_title %}Clinical Session: {{ consultation.patient.username }}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <h2>Session #CONS-{{ consultation.id }}</h2>
+    <span class="badge"
+        style="background: {% if consultation.status == 'ongoing' %}var(--warning){% else %}var(--success){% endif %}; color: {% if consultation.status == 'ongoing' %}#000{% else %}#fff{% endif %};">
+        {{ consultation.status|upper }}
+    </span>
+</div>
+
+<div style="display: grid; grid-template-columns: 3fr 2fr; gap: 30px;">
+    <!-- LEFT: Clinical Notes & Diagnosis -->
+    <div class="clinical-notes">
+        <div class="card">
+            <div class="card-title">Clinical Findings & Diagnosis</div>
+
+            {% if user.role == 'doctor' and consultation.status == 'ongoing' %}
+            <form method="post" action="{% url 'consultations:end_consultation' consultation.pk %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Doctor's Session Notes</label>
+                    <textarea name="notes" rows="8"
+                        placeholder="Enter continuous clinical observations...">{{ consultation.notes }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Final Diagnosis</label>
+                    <input type="text" name="diagnosis" value="{{ consultation.diagnosis }}"
+                        placeholder="e.g., Bronchitis, Acute Gastritis">
+                </div>
+                <div style="text-align: right;">
+                    <button type="submit" class="btn btn-success">Finalize Consultation</button>
+                </div>
+            </form>
+            {% else %}
+            <!-- Read Only View -->
+            <div class="form-group">
+                <label style="color: var(--secondary-color);">Clinical Notes</label>
+                <div style="padding: 15px; background: #fbfbfb; border: 1px solid #eee; border-radius: 4px;">
+                    {{ consultation.notes|linebreaks|default:"Session in progress..." }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label style="color: var(--secondary-color);">Diagnosis</label>
+                <div style="font-size: 1.2rem; font-weight: 600; color: var(--primary-color);">
+                    {{ consultation.diagnosis|default:"To be determined" }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- RIGHT: Prescriptions -->
+    <div class="prescriptions-side">
+        <div class="card">
+            <div class="card-title">Digital Prescriptions</div>
+
+            {% if user.role == 'doctor' and consultation.status == 'ongoing' %}
+            <!-- Form to add new prescription -->
+            <div
+                style="background: #fdfdfe; padding: 15px; border-radius: 4px; border: 1px dashed var(--border-color); margin-bottom: 20px;">
+                <h5 style="margin-top: 0;">Add Medication</h5>
+                <form method="post" action="{% url 'consultations:add_prescription' consultation.pk %}">
+                    {% csrf_token %}
+                    <input type="text" name="medication_name" placeholder="Medication Name" required
+                        style="margin-bottom: 10px;">
+                    <input type="text" name="dosage" placeholder="Dosage (e.g. 500mg, 2x daily)" required
+                        style="margin-bottom: 10px;">
+                    <textarea name="instructions" rows="2" placeholder="Instructions..."></textarea>
+                    <button type="submit" class="btn btn-primary"
+                        style="width: 100%; margin-top: 10px; font-size: 0.8rem;">Add to Script</button>
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- Table of issued prescriptions -->
+            <table style="font-size: 0.85rem;">
+                <thead>
+                    <tr>
+                        <th>Medication</th>
+                        <th>Dosage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in consultation.prescriptions.all %}
+                    <tr>
+                        <td><strong>{{ p.medication_name }}</strong></td>
+                        <td>{{ p.dosage }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" style="text-align: center; color: var(--secondary-color);">No medications
+                            prescribed yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Hospital Command Center{% endblock %}
+{% block page_title %}Administrative Dashboard{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 30px;">
+    <div class="card" style="text-align: center; border-bottom: 4px solid var(--primary-color);">
+        <h5 style="margin: 0; color: var(--secondary-color);">Patients</h5>
+        <div style="font-size: 1.8rem; font-weight: 700;">{{ stats.total_patients }}</div>
+    </div>
+    <div class="card" style="text-align: center; border-bottom: 4px solid var(--success);">
+        <h5 style="margin: 0; color: var(--secondary-color);">Staff</h5>
+        <div style="font-size: 1.8rem; font-weight: 700;">{{ stats.active_staff }}</div>
+    </div>
+    <div class="card" style="text-align: center; border-bottom: 4px solid var(--warning);">
+        <h5 style="margin: 0; color: var(--secondary-color);">Appts</h5>
+        <div style="font-size: 1.8rem; font-weight: 700;">{{ stats.pending_appointments }}</div>
+    </div>
+    <div class="card" style="text-align: center; border-bottom: 4px solid var(--danger);">
+        <h5 style="margin: 0; color: var(--secondary-color);">AI Reviews</h5>
+        <div style="font-size: 1.8rem; font-weight: 700;">{{ stats.pending_ai_reviews }}</div>
+    </div>
+    <div class="card" style="text-align: center; border-bottom: 4px solid var(--primary-dark);">
+        <h5 style="margin: 0; color: var(--secondary-color);">AI Accuracy</h5>
+        <div style="font-size: 1.8rem; font-weight: 700; color: var(--success);">{{ stats.ai_accuracy }}%</div>
+    </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+    <--role LEFT: RECENT ACTIVITY -->
+        <div class="card">
+            <div class="card-title">Recent System Activity</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>User</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in stats.recent_logs %}
+                    <tr>
+                        <td>{{ log.timestamp|date:"H:i:s" }}</td>
+                        <td><span class="badge" style="background:var(--bg-color); color:var(--text-color);">{{
+                                log.user.username }}</span></td>
+                        <td style="font-size: 0.85rem;">{{ log.action }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div style="text-align: right; margin-top: 15px;">
+                <a href="{% url 'admin_panel:audit_logs' %}" style="font-size: 0.85rem;">View Full Audit Trail
+                    &raquo;</a>
+            </div>
+        </div>
+
+        <--role RIGHT: QUICK ACTIONS -->
+            <div class="card">
+                <div class="card-title">Quick Actions</div>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <a href="{% url 'admin_panel:staff_add' %}" class="btn btn-primary">Add New Staff</a>
+                    <a href="{% url 'admin_panel:inventory_list' %}" class="btn btn-secondary"
+                        style="background:var(--secondary-color); color:#fff;">Manage Inventory</a>
+                    <a href="{% url 'admin_panel:audit_logs' %}" class="btn" style="background:var(--bg-color);">Full
+                        System Log</a>
+                    <hr>
+                    <a href="{% url 'diagnostics:result_history' %}" class="btn btn-success">View AI History</a>
+                </div>
+            </div>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard - OHMS{% endblock %}
+{% block page_title %}System Administration{% endblock %}
+{% block content %}
+<div class="card">
+    <h2>Hospital Command Center</h2>
+    <p>Monitor system health, manage users, and audit clinical logs.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+    <div class="card" style="text-align: center;">
+        <h3>Users</h3>
+        <a href="{% url 'admin_panel:manage_users' %}" class="btn btn-primary">Manage Access</a>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h3>Audits</h3>
+        <a href="{% url 'admin_panel:audit_logs' %}" class="btn btn-secondary">Review Logs</a>
+    </div>
+    <div class="card" style="text-align: center;">
+        <h3>AI Report</h3>
+        <a href="{% url 'diagnostics:history' %}" class="btn btn-success">Validation History</a>
+    </div>
+</div>
+{% endblock %}

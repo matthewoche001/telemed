@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Dashboard - OHMS{% endblock %}
+{% block page_title %}Clinic Overview{% endblock %}
+
+{% block content %}
+<div class="dashboard-header" style="margin-bottom: 30px;">
+    <h2>Welcome, Dr. {{ user.get_full_name|default:user.username }}</h2>
+    <p style="color: var(--secondary-color);">Manage your patients, consultations, and AI diagnostic validation.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px;">
+    <div class="card" style="padding: 20px; text-align: center;">
+        <h3 style="margin: 0; color: var(--primary-color);">Schedule</h3>
+        <p style="font-size: 0.85rem;">Today's Appointments</p>
+        <a href="{% url 'appointments:appointment_list' %}" class="btn btn-primary"
+            style="padding: 5px 10px; font-size: 0.8rem;">View All</a>
+    </div>
+    <div class="card" style="padding: 20px; text-align: center;">
+        <h3 style="margin: 0; color: var(--danger);">Reviews</h3>
+        <p style="font-size: 0.85rem;">Pending AI Scans</p>
+        <a href="{% url 'diagnostics:pending_reviews' %}" class="btn btn-danger"
+            style="padding: 5px 10px; font-size: 0.8rem;">Review ({{ stats.pending_ai_reviews|default:0 }})</a>
+    </div>
+    <div class="card" style="padding: 20px; text-align: center;">
+        <h3 style="margin: 0; color: var(--success);">Patients</h3>
+        <p style="font-size: 0.85rem;">Total Registry</p>
+        <a href="{% url 'patients:patient_list' %}" class="btn btn-success"
+            style="padding: 5px 10px; font-size: 0.8rem;">Browse</a>
+    </div>
+    <div class="card" style="padding: 20px; text-align: center;">
+        <h3 style="margin: 0; color: var(--secondary-color);">Archive</h3>
+        <p style="font-size: 0.85rem;">Prescriptions</p>
+        <a href="{% url 'consultations:prescription_list' %}" class="btn"
+            style="background: var(--bg-color); padding: 5px 10px; font-size: 0.8rem;">History</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title">Pending Clinical Tasks</div>
+    <table>
+        <thead>
+            <tr>
+                <th>Patient</th>
+                <th>Task Type</th>
+                <th>Due</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="4" style="text-align: center; color: var(--secondary-color);">Select a category above to
+                    manage specific tasks.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Diagnostic History - OHMS{% endblock %}
+{% block page_title %}Clinical Validation History{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <h3>Finalized Diagnostic Reports</h3>
+        <p style="color: var(--secondary-color); font-size: 0.9rem;">Comprehensive log of AI suggestions & Physician
+            verdicts.</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Validated At</th>
+                <th>Scan ID</th>
+                <th>Patient</th>
+                <th>AI Suggestion</th>
+                <th>Physician Verdict</th>
+                <th>Reviewing Doctor</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for res in results %}
+            <tr>
+                <td>{{ res.validated_at|date:"Y-m-d H:i" }}</td>
+                <td>#SCN-{{ res.scan.id }}</td>
+                <td>{{ res.scan.patient.username }}</td>
+                <td>
+                    <span class="badge" style="background:var(--bg-color); color:var(--text-color);">{{
+                        res.predicted_class|upper }}</span>
+                </td>
+                <td>
+                    {% if res.validation_status == 'approved' %}<span class="badge badge-confirmed">APPROVED</span>
+                    {% elif res.validation_status == 'corrected' %}<span class="badge"
+                        style="background:var(--warning); color:#000;">CORRECTED</span>
+                    {% else %}<span class="badge" style="background:var(--danger); color:#fff;">REJECTED</span>
+                    {% endif %}
+                </td>
+                <td>Dr. {{ res.doctor.username }}</td>
+                <td>
+                    <a href="{% url 'diagnostics:scan_detail' res.scan.pk %}" class="btn"
+                        style="background:#e9ecef; padding: 5px 12px; font-size: 0.8rem;">View Report</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align: center;">No finalized results yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

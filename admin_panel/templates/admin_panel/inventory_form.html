@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}{% if edit %}Edit{% else %}Add{% endif %} Item - OHMS{% endblock %}
+{% block page_title %}Supply Registry{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 0 auto;">
+    <div class="card">
+        <div class="card-title">{% if edit %}Update Stock Level{% else %}Register New Supply Item{% endif %}</div>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<div style="color:var(--danger); font-size:0.8rem;">{{ field.errors }}</div>{%
+                endif %}
+            </div>
+            {% endfor %}
+            <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px;">
+                <a href="{% url 'admin_panel:inventory_list' %}" class="btn"
+                    style="background:var(--bg-color);">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Item</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

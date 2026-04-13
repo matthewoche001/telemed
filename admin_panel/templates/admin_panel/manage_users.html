@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>User Management</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Full Name</th>
+            <th>Current Role</th>
+            <th>Change Role</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user_obj in users %}
+        <tr>
+            <td>{{ user_obj.username }}</td>
+            <td>{{ user_obj.get_full_name }}</td>
+            <td><strong>{{ user_obj.get_role_display }}</strong></td>
+            <td>
+                <form method="post" action="{% url 'admin_panel:update_role' user_obj.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                    <select name="role">
+                        <option value="doctor" {% if user_obj.role == 'doctor' %}selected{% endif %}>Doctor</option>
+                        <option value="nurse" {% if user_obj.role == 'nurse' %}selected{% endif %}>Nurse</option>
+                        <option value="patient" {% if user_obj.role == 'patient' %}selected{% endif %}>Patient</option>
+                        <option value="lab_tech" {% if user_obj.role == 'lab_tech' %}selected{% endif %}>Lab Tech</option>
+                        <option value="admin" {% if user_obj.role == 'admin' %}selected{% endif %}>Admin</option>
+                    </select>
+                    <button type="submit">Update</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<br>
+<a href="{% url 'admin_panel:dashboard' %}">Back to Dashboard</a>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}OHMS - Hospital Management{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <div class="app-container">
+        {% if user.is_authenticated %}
+        <aside class="sidebar">
+            <div class="sidebar-header">OHMS</div>
+            <nav class="sidebar-nav">
+                <a href="{% url 'root' %}" class="nav-item">Dashboard</a>
+                {% if user.role == 'doctor' %}
+                <a href="{% url 'appointments:appointment_list' %}" class="nav-item">My Appointments</a>
+                <a href="{% url 'diagnostics:pending_reviews' %}" class="nav-item">Diagnostic Reviews</a>
+                <a href="{% url 'patients:patient_list' %}" class="nav-item">Patient Records</a>
+                {% elif user.role == 'nurse' %}
+                <a href="{% url 'patients:patient_list' %}" class="nav-item">Patient Records</a>
+                <a href="{% url 'appointments:appointment_list' %}" class="nav-item">All Appointments</a>
+                <a href="{% url 'diagnostics:upload_scan' %}" class="nav-item">Upload Scan</a>
+                {% elif user.role == 'patient' %}
+                {% if user.patient_profile and user.patient_profile.pk %}
+                <a href="{% url 'patients:patient_detail' pk=user.patient_profile.pk %}" class="nav-item">My Health Record</a>
+                {% else %}
+                <a href="{% url 'patients:patient_edit' %}" class="nav-item">Complete My Profile</a>
+                {% endif %}
+                <a href="{% url 'appointments:appointment_list' %}" class="nav-item">My Appointments</a>
+                <a href="{% url 'appointments:book_appointment' %}" class="nav-item">Book Appointment</a>
+                <a href="{% url 'consultations:prescription_list' %}" class="nav-item">Prescriptions</a>
+                {% elif user.role == 'admin' %}
+                <a href="{% url 'admin_panel:dashboard' %}" class="nav-item">Admin Home</a>
+                <a href="{% url 'admin_panel:staff_list' %}" class="nav-item">Staff Registry</a>
+                <a href="{% url 'admin_panel:inventory_list' %}" class="nav-item">Inventory</a>
+                <a href="{% url 'admin_panel:audit_logs' %}" class="nav-item">System Logs</a>
+                <a href="{% url 'diagnostics:result_history' %}" class="nav-item">AI History</a>
+                {% elif user.role == 'lab_tech' %}
+                <a href="{% url 'diagnostics:upload_scan' %}" class="nav-item">Upload CT Scan</a>
+                <a href="{% url 'diagnostics:scan_list' %}" class="nav-item">Recent Scans</a>
+                {% endif %}
+            </nav>
+        </aside>
+        {% endif %}
+
+        <div class="main-wrapper {% if not user.is_authenticated %}no-sidebar{% endif %}">
+            <header class="top-navbar">
+                <div class="page-identity">
+                    <span style="font-weight: 500; color: var(--secondary-color);">{% block page_title %}{% endblock %}</span>
+                </div>
+                {% if user.is_authenticated %}
+                <div class="user-actions" style="display: flex; align-items: center;">
+                    <a href="{% url 'notifications:list' %}" class="notification-bell">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path
+                                d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
+                        </svg>
+                        {% if unread_count > 0 %}<span class="badge-count">{{ unread_count }}</span>{% endif %}
+                    </a>
+                    <div class="user-info" style="margin-right: 20px;">
+                        <span style="font-size: 0.9rem; font-weight: 600;">{{ user.username }}</span>
+                        <span class="badge" style="background: #e9ecef; color: var(--primary-color);">{{user.get_role_display }}</span>
+                    </div>
+                    <form action="{% url 'accounts:logout' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn"
+                            style="background: none; border: 1px solid var(--border-color); color: var(--secondary-color); padding: 5px 12px; font-size: 0.8rem;">Logout</button>
+                    </form>
+                </div>
+                {% endif %}
+            </header>
+
+            <main class="content-area">
+                {% if messages %}
+                <div id="messages">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    <script>
+        setTimeout(function () {
+            var msgs = document.getElementById('messages');
+            if (msgs) msgs.style.display = 'none';
+        }, 5000);
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

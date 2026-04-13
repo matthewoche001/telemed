@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Pending Reviews - OHMS{% endblock %}
+{% block page_title %}Clinical Validation Queue{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <h3>Awaiting Medical Verdict</h3>
+        <p style="color: var(--secondary-color); font-size: 0.9rem;">Review and validate CNN-generated predictions.</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Scan ID</th>
+                <th>Patient</th>
+                <th>AI Prediction</th>
+                <th>Inference Confidence</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for res in results %}
+            <tr>
+                <td><strong>#SCN-{{ res.scan.id }}</strong></td>
+                <td>{{ res.scan.patient.username }}</td>
+                <td>
+                    <span class="badge"
+                        style="background: {% if res.predicted_class == 'abnormal' %}var(--danger){% else %}var(--success){% endif %}; color: #fff;">
+                        {{ res.predicted_class|upper }}
+                    </span>
+                </td>
+                <td>
+                    <div
+                        style="width: 100%; background: #eee; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 5px;">
+                        <div
+                            style="width: {% widthratio res.confidence_score 1 100 %}%; background: {% if res.confidence_score < 0.5 %}var(--danger){% elif res.confidence_score < 0.8 %}var(--warning){% else %}var(--success){% endif %}; height: 100%;">
+                        </div>
+                    </div>
+                    <small>{{ res.confidence_score|floatformat:2 }}</small>
+                </td>
+                <td>
+                    <a href="{% url 'diagnostics:review_detail' res.pk %}" class="btn btn-primary"
+                        style="padding: 5px 12px; font-size: 0.8rem;">Start Review</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 40px; color: var(--secondary-color);">All scans
+                    across the system have been validated. No pending tasks.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

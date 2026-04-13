@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Scan Analysis - #{{ scan.id }}{% endblock %}
+{% block page_title %}Diagnostic Report Detail{% endblock %}
+
+{% block content %}
+<div style="max-width: 900px; margin: 0 auto;">
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
+            <div>
+                <h3 style="margin: 0;">Scan #{{ scan.id }}</h3>
+                <p style="color: var(--secondary-color);">Uploaded: {{ scan.upload_timestamp }}</p>
+            </div>
+            <div style="text-align: right;">
+                <label style="display: block; font-size: 0.75rem; color: var(--secondary-color);">Status</label>
+                <strong>{{ scan.get_status_display|upper }}</strong>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <div class="scan-image">
+                <label style="display: block; margin-bottom: 10px; font-weight: 600;">Original Image</label>
+                <img src="{{ scan.original_file.url }}"
+                    style="max-width: 100%; border: 1px solid var(--border-color); border-radius: 8px;">
+            </div>
+
+            <div class="scan-meta">
+                <div class="card" style="background: #f8f9fa; border: none; padding: 15px;">
+                    <h5 style="margin-top: 0;">Imaging Metadata</h5>
+                    <p style="font-size: 0.9rem;"><strong>Patient Name:</strong> {{
+                        scan.patient.get_full_name|default:scan.patient.username }}</p>
+                    <p style="font-size: 0.9rem;"><strong>Uploader:</strong> {{ scan.uploaded_by.username }}</p>
+                    <p style="font-size: 0.9rem;"><strong>Pipeline Status:</strong>
+                        {% if scan.preprocessed_path %}<span style="color: var(--success);">SUCCESS (Grayscale, Median
+                            Filter, CLAHE)</span>
+                        {% else %}<span style="color: var(--warning);">PENDING</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                {% if ai_result %}
+                <div class="card" style="border-left: 5px solid var(--primary-color);">
+                    <div class="card-title">Medical Narrative</div>
+                    <p><strong>Diagnosis:</strong> <span style="text-transform: uppercase; font-weight: bold;">{{
+                            ai_result.predicted_class }}</span></p>
+                    <p><strong>Clinical Verdict:</strong> {{ ai_result.get_validation_status_display }}</p>
+                    <p><strong>Verified By:</strong> Dr. {{ ai_result.doctor.username }}</p>
+                    <hr>
+                    <p style="font-style: italic; font-size: 0.9rem;">"{{ ai_result.doctor_notes|default:'No specific
+                        clinical notes added.' }}"</p>
+                </div>
+                {% elif user.role == 'doctor' and scan.status == 'analyzed' %}
+                <div class="card" style="background: #fff3cd; border: 1px solid #ffeeba; text-align: center;">
+                    <p>AI Analysis is complete. Please perform clinical validation.</p>
+                    <a href="{% url 'diagnostics:review_detail' scan.ai_result.pk %}" class="btn btn-primary">Review
+                        Now</a>
+                </div>
+                {% else %}
+                <div class="card" style="background: #e9ecef; border: none; text-align: center;">
+                    <p style="color: var(--secondary-color);">Professional clinical validation is pending for this scan.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; text-align: right;">
+            <a href="{% url 'diagnostics:scan_list' %}" class="btn" style="background: var(--bg-color);">Back to
+                Workspace</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

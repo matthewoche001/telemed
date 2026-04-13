@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Register - OHMS{% endblock %}
+{% block page_title %}Patient Registration{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 40px auto;">
+    <div class="card">
+        <div class="card-title" style="text-align: center;">New Patient Registration</div>
+        <p style="text-align: center; color: var(--secondary-color); font-size: 0.9rem; margin-bottom: 25px;">Create
+            your health record and book appointments today.</p>
+
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div style="color: var(--danger); font-size: 0.8rem; margin-top: 5px;">
+                    {{ field.errors|striptags }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-success" style="width: 100%; margin-top: 10px;">Create Account</button>
+        </form>
+
+        <div style="text-align: center; margin-top: 20px; font-size: 0.85rem;">
+            Already registered? <a href="{% url 'accounts:login' %}" style="color: var(--primary-color);">Sign In</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

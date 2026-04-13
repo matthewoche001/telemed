@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Prescriptions - OHMS{% endblock %}
+{% block page_title %}Prescription Records{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-title">Digital Signature Pharmacy Log</div>
+    <p style="color: var(--secondary-color); font-size: 0.9rem;">The following medications have been issued by OHMS
+        licensed physicians.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date Issued</th>
+                <th>Medication</th>
+                <th>Dosage</th>
+                <th>Doctor</th>
+                {% if user.role != 'patient' %}<th>Patient</th>{% endif %}
+                <th>Instructions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in prescriptions %}
+            <tr>
+                <td>{{ p.issued_at|date:"Y-m-d" }}</td>
+                <td><strong>{{ p.medication_name }}</strong></td>
+                <td>{{ p.dosage }}</td>
+                <td>Dr. {{ p.doctor.username }}</td>
+                {% if user.role != 'patient' %}<td>{{ p.patient.username }}</td>{% endif %}
+                <td style="font-size: 0.8rem; color: var(--secondary-color);">{{ p.instructions|truncatewords:10 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center;">No prescriptions found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

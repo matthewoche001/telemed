@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Upload Scan - OHMS{% endblock %}
+{% block page_title %}Diagnostic Imaging Upload{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <div class="card">
+        <div class="card-title">New CT Scan Submission</div>
+        <p style="color: var(--secondary-color); font-size: 0.9rem;">
+            Upload clinical images for CNN-assisted cardiac analysis.
+        </p>
+
+        <form method="post" enctype="multipart/form-data" id="uploadForm">
+            {% csrf_token %}
+
+            <div class="upload-zone" id="dropZone"
+                style="border: 2px dashed var(--border-color); padding: 40px; text-align: center; border-radius: 8px; background: #fafafa; cursor: pointer; transition: all 0.3s;">
+                <svg width="50" height="50" fill="var(--secondary-color)" viewBox="0 0 16 16"
+                    style="margin-bottom: 15px;">
+                    <path
+                        d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                    <path
+                        d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
+                </svg>
+                <div style="font-weight: 600; color: var(--primary-color);">Click to upload or drag & drop</div>
+                <p style="font-size: 0.8rem; color: var(--secondary-color);">Accepted formats: DICOM (.dcm), PNG, JPG
+                    (Max 10MB)</p>
+
+                <div style="margin-top: 20px;">
+                    {{ form.original_file }}
+                </div>
+                {% if form.original_file.errors %}
+                <div class="alert alert-danger" style="margin-top: 15px;">{{ form.original_file.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group" style="margin-top: 25px;">
+                <label for="{{ form.patient.id_for_label }}">Assign to Patient</label>
+                {{ form.patient }}
+                {% if form.patient.errors %}<div class="alert alert-danger">{{ form.patient.errors }}</div>{% endif %}
+            </div>
+
+            <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px;">
+                <a href="{% url 'diagnostics:scan_list' %}" class="btn" style="background: var(--bg-color);">Cancel</a>
+                <button type="submit" class="btn btn-primary" id="submitBtn">Start Automated Analysis</button>
+            </div>
+        </form>
+
+        <!-- Loading Spinner Hidden by Default -->
+        <div id="loadingOverlay" style="display: none; text-align: center; margin-top: 20px;">
+            <div class="spinner"
+                style="border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; width: 30px; height: 30px; animation: spin 2s linear infinite; display: inline-block;">
+            </div>
+            <p style="color: var(--primary-color); font-weight: 600;">Processing Image & Running CNN Inference...</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .upload-zone:hover {
+        background: #f0f7ff;
+        border-color: var(--primary-color);
+    }
+</style>
+
+<script>
+    document.getElementById('uploadForm').onsubmit = function () {
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('loadingOverlay').style.display = 'block';
+    };
+</script>
+{% endblock %}

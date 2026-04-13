@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Appointment Detail{% endblock %}
+{% block page_title %}Appointment Details{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <div class="card">
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid var(--bg-color); padding-bottom: 15px;">
+            <h3 style="margin: 0;">#APP-{{ appointment.id }}</h3>
+            {% if appointment.status == 'pending' %}<span class="badge badge-pending">PENDING CONFIRMATION</span>
+            {% elif appointment.status == 'confirmed' %}<span class="badge badge-confirmed">CONFIRMED</span>
+            {% elif appointment.status == 'completed' %}<span class="badge"
+                style="background:var(--secondary-color); color:#fff;">COMPLETED</span>
+            {% else %}<span class="badge" style="background:var(--danger); color:#fff;">{{ appointment.status|upper
+                }}</span>
+            {% endif %}
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+            <div>
+                <label
+                    style="color: var(--secondary-color); font-size: 0.8rem; text-transform: uppercase;">Patient</label>
+                <div style="font-weight: 600; font-size: 1.1rem;">{{
+                    appointment.patient.get_full_name|default:appointment.patient.username }}</div>
+            </div>
+            <div>
+                <label style="color: var(--secondary-color); font-size: 0.8rem; text-transform: uppercase;">Assigned
+                    Physician</label>
+                <div style="font-weight: 600; font-size: 1.1rem;">Dr. {{
+                    appointment.doctor.get_full_name|default:appointment.doctor.username }}</div>
+            </div>
+            <div>
+                <label style="color: var(--secondary-color); font-size: 0.8rem; text-transform: uppercase;">Scheduled
+                    At</label>
+                <div style="font-weight: 600;">{{ appointment.scheduled_at|date:"l, F d, Y" }}</div>
+                <div>{{ appointment.scheduled_at|date:"H:i" }} (GMT+1)</div>
+            </div>
+            <div>
+                <label style="color: var(--secondary-color); font-size: 0.8rem; text-transform: uppercase;">Created
+                    On</label>
+                <div style="color: var(--secondary-color);">{{ appointment.created_at|date:"Y-m-d H:i" }}</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label style="color: var(--secondary-color); font-size: 0.8rem; text-transform: uppercase;">Patient
+                Notes</label>
+            <div
+                style="background: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 3px solid var(--primary-color);">
+                {{ appointment.notes|default:"No specific notes provided for this visit." }}
+            </div>
+        </div>
+
+        <hr style="margin: 30px 0;">
+
+        <div class="actions" style="display: flex; gap: 10px; justify-content: flex-end;">
+            {% if user.role == 'doctor' or user.role == 'admin' %}
+            <form method="post" action="{% url 'appointments:update_status' appointment.pk %}"
+                style="display: flex; gap: 10px;">
+                {% csrf_token %}
+                <select name="status" class="form-control" style="width: auto;">
+                    <option value="confirmed" {% if appointment.status=='confirmed' %}selected{% endif %}>Confirm
+                    </option>
+                    <option value="cancelled" {% if appointment.status=='cancelled' %}selected{% endif %}>Cancel
+                    </option>
+                    <option value="completed" {% if appointment.status=='completed' %}selected{% endif %}>Mark Completed
+                    </option>
+                </select>
+                <button type="submit" class="btn btn-primary">Update Status</button>
+            </form>
+            {% endif %}
+
+            {% if user.role == 'doctor' and appointment.status == 'confirmed' %}
+            <a href="{% url 'consultations:start_consultation' appointment.pk %}" class="btn btn-success">Start
+                Consultation</a>
+            {% endif %}
+
+            <a href="{% url 'appointments:appointment_list' %}" class="btn" style="background: var(--bg-color);">Back to
+                List</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

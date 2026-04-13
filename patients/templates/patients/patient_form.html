@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile - OHMS{% endblock %}
+{% block page_title %}Update Patient Record{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="card">
+            <div class="card-title">Personal Information</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth</label>
+                    {{ form.date_of_birth }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.gender.id_for_label }}">Gender</label>
+                    {{ form.gender }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.blood_group.id_for_label }}">Blood Group</label>
+                    {{ form.blood_group }}
+                </div>
+                <div class="form-group">
+                    <label for="{{ form.address.id_for_label }}">Residential Address</label>
+                    {{ form.address }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Medical Context & Emergency</div>
+            <div class="form-group">
+                <label for="{{ form.emergency_contact.id_for_label }}">Emergency Contact (Name & Phone)</label>
+                {{ form.emergency_contact }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.medical_history.id_for_label }}">Medical History / Allergies / Chronic
+                    Conditions</label>
+                {{ form.medical_history }}
+                <p style="font-size: 0.75rem; color: var(--secondary-color); margin-top: 5px;">Provide detailed clinical
+                    background to assist your doctor.</p>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 15px; justify-content: flex-end;">
+            <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn"
+                style="background: var(--bg-color); color: var(--text-color);">Cancel</a>
+            <button type="submit" class="btn btn-success">Save Clinical Record</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

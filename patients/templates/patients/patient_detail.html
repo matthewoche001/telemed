@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Patient Chart - {{ patient.user.username }}{% endblock %}
+{% block page_title %}Medical Record: {{ patient.user.get_full_name|default:patient.user.username }}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
+    <div>
+        <h2 style="margin: 0;">{{ patient.user.get_full_name }}</h2>
+        <p style="color: var(--secondary-color);">Patient ID: #{{ patient.id }} | Born: {{ patient.date_of_birth }}</p>
+    </div>
+    {% if user.role == 'patient' and user.patient_profile == patient %}
+    <a href="{% url 'patients:patient_edit' %}" class="btn btn-primary">Edit My Profile</a>
+    {% endif %}
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+    <!-- LEFT COLUMN: Patient Info -->
+    <div class="sidebar-info">
+        <div class="card" style="border-top: 5px solid var(--primary-color);">
+            <div class="card-title">Vital Stats</div>
+            <p><strong>Blood Group:</strong> {{ patient.blood_group }}</p>
+            <p><strong>Gender:</strong> {{ patient.get_gender_display }}</p>
+            <p><strong>Phone:</strong> {{ patient.user.phone|default:"Not provided" }}</p>
+            <p><strong>Emergency Contact:</strong><br><small>{{ patient.emergency_contact|linebreaks }}</small></p>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Address</div>
+            <p style="font-size: 0.9rem;">{{ patient.address|linebreaks }}</p>
+        </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Medical History & Activity -->
+    <div class="medical-data">
+        <div class="card">
+            <div class="card-title">Medical History</div>
+            <p style="background: #fdfdfe; padding: 15px; border: 1px dashed var(--border-color); border-radius: 4px;">
+                {{ patient.medical_history|linebreaks|default:"No significant medical history recorded." }}
+            </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="card">
+                <div class="card-title" style="font-size: 0.9rem;">Recent Scans</div>
+                <ul style="padding-left: 20px; font-size: 0.85rem;">
+                    {% for scan in patient.uploaded_scans.all|slice:":3" %}
+                    <li>{{ scan.upload_timestamp|date:"M d, Y" }} - <strong>{{ scan.get_status_display }}</strong></li>
+                    {% empty %}
+                    <li style="color: var(--secondary-color);">No scans on record.</li>
+                    {% endfor %}
+                </ul>
+                <a href="{% url 'diagnostics:scan_list' %}" style="font-size: 0.8rem;">View All Scans</a>
+            </div>
+
+            <div class="card">
+                <div class="card-title" style="font-size: 0.9rem;">Active Prescriptions</div>
+                <ul style="padding-left: 20px; font-size: 0.85rem;">
+                    {% for presc in patient.patient_prescriptions.all|slice:":3" %}
+                    <li>{{ presc.medication_name }} ({{ presc.dosage }})</li>
+                    {% empty %}
+                    <li style="color: var(--secondary-color);">No active prescriptions.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Clinical Consultations</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="font-size: 0.75rem;">Date</th>
+                        <th style="font-size: 0.75rem;">Doctor</th>
+                        <th style="font-size: 0.75rem;">Summary</th>
+                    </tr>
+                </thead>
+                <tbody style="font-size: 0.85rem;">
+                    {% for consult in patient.patient_consultations.all|slice:":5" %}
+                    <tr>
+                        <td>{{ consult.started_at|date:"Y-m-d" }}</td>
+                        <td>Dr. {{ consult.doctor.username }}</td>
+                        <td><a href="{% url 'consultations:consultation_detail' consult.pk %}">View Notes</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: var(--secondary-color);">No consultation
+                            history available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
