@@ -35,3 +35,6 @@ diagnostics/ml_models/*.pth
 # OS
 .DS_Store
 Thumbs.db
+
+# Project specific
+GEMINI.md
