@@ -30,7 +30,7 @@ def final_system_check():
         'admin_panel:inventory_list',
         'admin_panel:audit_logs',
         'notifications:list',
-        'diagnostics:history',
+        'diagnostics:result_history',
     ]
     
     for url_name in urls:

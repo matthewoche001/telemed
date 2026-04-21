@@ -1,23 +1,45 @@
 {% extends 'base.html' %}
-{% block title %}Admin Dashboard - OHMS{% endblock %}
-{% block page_title %}System Administration{% endblock %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+
 {% block content %}
-<div class="card">
-    <h2>Hospital Command Center</h2>
-    <p>Monitor system health, manage users, and audit clinical logs.</p>
+<div class="page-title-block">
+    <h1 class="page-title">Hospital Command Center</h1>
+    <p class="page-subtitle">System overview and management</p>
 </div>
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-    <div class="card" style="text-align: center;">
-        <h3>Users</h3>
-        <a href="{% url 'admin_panel:manage_users' %}" class="btn btn-primary">Manage Access</a>
+
+<div class="stats-grid">
+    <a href="{% url 'admin_panel:staff_list' %}" class="stat-card" style="text-decoration: none;">
+        <div class="stat-label">Active Staff</div>
+        <div class="stat-value">{{ stats.active_staff|default:"0" }}</div>
+    </a>
+    <a href="{% url 'admin_panel:inventory_list' %}" class="stat-card" style="text-decoration: none;">
+        <div class="stat-label">Inventory Items</div>
+        <div class="stat-value">Stock</div>
+    </a>
+    <a href="{% url 'admin_panel:audit_logs' %}" class="stat-card" style="text-decoration: none;">
+        <div class="stat-label">Audit Logs</div>
+        <div class="stat-value">View</div>
+    </a>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Quick Actions</div>
+        </div>
+        <div class="flex gap-sm" style="flex-wrap: wrap;">
+            <a href="{% url 'admin_panel:staff_add' %}" class="btn btn-primary">Add Staff</a>
+            <a href="{% url 'admin_panel:inventory_list' %}" class="btn btn-secondary">Inventory</a>
+            <a href="{% url 'admin_panel:audit_logs' %}" class="btn btn-ghost">Audit Logs</a>
+        </div>
     </div>
-    <div class="card" style="text-align: center;">
-        <h3>Audits</h3>
-        <a href="{% url 'admin_panel:audit_logs' %}" class="btn btn-secondary">Review Logs</a>
-    </div>
-    <div class="card" style="text-align: center;">
-        <h3>AI Report</h3>
-        <a href="{% url 'diagnostics:history' %}" class="btn btn-success">Validation History</a>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">System Health</div>
+        </div>
+        <div class="text-sm text-secondary">All systems operational</div>
     </div>
 </div>
 {% endblock %}

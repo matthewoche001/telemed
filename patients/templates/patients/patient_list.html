@@ -1,61 +1,43 @@
 {% extends 'base.html' %}
-{% block title %}Patients - OHMS{% endblock %}
+{% block title %}Patients{% endblock %}
 {% block page_title %}Patient Registry{% endblock %}
 
 {% block content %}
-<div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h3 style="margin: 0;">Total Patients ({{ patients.count }})</h3>
-        <!-- Simple search filter for convenience -->
-        <div class="search-box">
-            <input type="text" id="patientSearch" placeholder="Search by name or username..." onkeyup="filterPatients()"
-                style="max-width: 300px;">
-        </div>
-    </div>
-
-    <table id="patientTable">
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>Full Name</th>
-                <th>Blood Group</th>
-                <th>Gender</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for patient in patients %}
-            <tr>
-                <td>{{ patient.user.username }}</td>
-                <td>{{ patient.user.get_full_name|default:patient.user.username }}</td>
-                <td><span class="badge" style="background: #e9ecef; color: var(--text-color);">{{ patient.blood_group
-                        }}</span></td>
-                <td>{{ patient.get_gender_display }}</td>
-                <td>
-                    <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-primary"
-                        style="padding: 5px 12px; font-size: 0.8rem;">View Chart</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" style="text-align: center;">No patients registered in the system.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="flex justify-between items-center mb-md">
+    <h1 class="page-title" style="margin: 0;">Patients</h1>
 </div>
 
-<script>
-    function filterPatients() {
-        let input = document.getElementById('patientSearch');
-        let filter = input.value.toLowerCase();
-        let table = document.getElementById('patientTable');
-        let tr = table.getElementsByTagName('tr');
-
-        for (let i = 1; i < tr.length; i++) {
-            let text = tr[i].textContent.toLowerCase();
-            tr[i].style.display = text.indexOf(filter) > -1 ? "" : "none";
-        }
-    }
-</script>
+<div class="card" style="padding: 0;">
+    <div class="table-container" style="border: none; border-radius: 0;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Gender</th>
+                    <th>Blood Group</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr>
+                    <td>
+                        <div class="font-medium">{{ patient.user.get_full_name|default:patient.user.username }}</div>
+                        <div class="text-xs text-muted">{{ patient.user.email }}</div>
+                    </td>
+                    <td class="text-sm">{{ patient.gender|default:"-" }}</td>
+                    <td class="text-sm">{{ patient.blood_group|default:"-" }}</td>
+                    <td>
+                        <a href="{% url 'patients:patient_detail' patient.pk %}" class="btn btn-ghost btn-sm">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-muted" style="text-align: center; padding: var(--space-xl);">No patients found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}

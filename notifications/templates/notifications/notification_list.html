@@ -1,73 +1,32 @@
 {% extends 'base.html' %}
-{% block title %}My Notifications - OHMS{% endblock %}
-{% block page_title %}Alert Center{% endblock %}
+{% block title %}Notifications{% endblock %}
+{% block page_title %}Notifications{% endblock %}
 
 {% block content %}
-<div style="max-width: 800px; margin: 0 auto;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-        <h2>Alert History</h2>
-        <a href="{% url 'notifications:mark_all_read' %}" class="btn btn-primary" style="font-size: 0.85rem;">Mark All
-            as Read</a>
-    </div>
+<div class="flex justify-between items-center mb-md">
+    <h1 class="page-title" style="margin: 0;">Notifications</h1>
+    {% if notifications %}
+    <form action="{% url 'notifications:mark_all_read' %}" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-ghost btn-sm">Mark all read</button>
+    </form>
+    {% endif %}
+</div>
 
-    <!-- UNREAD SECTION -->
-    <div class="card" style="border-left: 5px solid var(--primary-color);">
-        <div class="card-title">Unread Alerts ({{ unread_count|default:0 }})</div>
-        <div class="notification-stream">
-            {% for n in notifications %}
-            {% if not n.is_read %}
-            <div
-                style="padding: 15px; border-bottom: 1px solid var(--bg-color); display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; gap: 15px; align-items: flex-start;">
-                    <div class="type-icon"
-                        style="background: #e7f3ff; color: var(--primary-color); padding: 5px; border-radius: 4px;">
-                        <!-- Simple SVG based on type -->
-                        {% if n.notification_type == 'appointment' %}📅
-                        {% elif n.notification_type == 'ct_result' %}🩻
-                        {% elif n.notification_type == 'consultation' %}🩺
-                        {% else %}🔔
-                        {% endif %}
-                    </div>
-                    <div>
-                        <div style="font-weight: 600;">{{ n.message }}</div>
-                        <small style="color: var(--secondary-color);">{{ n.created_at|timesince }} ago</small>
-                    </div>
-                </div>
-                <a href="{% url 'notifications:mark_read' n.pk %}" class="btn btn-success"
-                    style="padding: 5px 12px; font-size: 0.75rem;">View & Mark Read</a>
-            </div>
-            {% endif %}
-            {% endfor %}
-            {% if unread_count == 0 %}
-            <p style="padding: 20px; text-align: center; color: var(--secondary-color);">All caught up! No unread
-                notifications.</p>
-            {% endif %}
+<div class="card" style="padding: 0;">
+    {% for n in notifications %}
+    <div class="flex items-center gap-md" style="padding: var(--space-md); border-bottom: 1px solid var(--border);">
+        <div style="flex: 1;">
+            <div class="text-sm">{{ n.message }}</div>
+            <div class="text-xs text-muted">{{ n.created_at|timesince }} ago</div>
         </div>
+        {% if not n.is_read %}
+        <span class="badge badge-primary">New</span>
+        {% endif %}
+        <a href="{% url 'notifications:mark_read' n.pk %}" class="btn btn-ghost btn-sm">View</a>
     </div>
-
-    <!-- READ SECTION -->
-    <div class="card" style="opacity: 0.8;">
-        <div class="card-title" style="font-size: 1rem; color: var(--secondary-color);">Earlier Alerts</div>
-        <div class="notification-stream">
-            {% for n in notifications %}
-            {% if n.is_read %}
-            <div
-                style="padding: 12px; border-bottom: 1px solid var(--bg-color); display: flex; gap: 15px; align-items: center;">
-                <div style="font-size: 0.9rem; color: var(--secondary-color);">
-                    {% if n.notification_type == 'appointment' %}📅
-                    {% elif n.notification_type == 'ct_result' %}🩻
-                    {% elif n.notification_type == 'consultation' %}🩺
-                    {% else %}🔔
-                    {% endif %}
-                </div>
-                <div>
-                    <div style="font-size: 0.9rem; color: var(--secondary-color);">{{ n.message }}</div>
-                    <small style="color: #ccc;">{{ n.created_at|date:"M d, H:i" }}</small>
-                </div>
-            </div>
-            {% endif %}
-            {% endfor %}
-        </div>
-    </div>
+    {% empty %}
+    <div class="text-muted text-sm" style="padding: var(--space-xl); text-align: center;">No notifications</div>
+    {% endfor %}
 </div>
 {% endblock %}

@@ -1,48 +1,48 @@
 {% extends 'base.html' %}
-{% block title %}Book Appointment - OHMS{% endblock %}
-{% block page_title %}Schedule a Consultation{% endblock %}
+{% block title %}Book Appointment{% endblock %}
+{% block page_title %}Book Appointment{% endblock %}
 
 {% block content %}
 <div style="max-width: 600px; margin: 0 auto;">
     <div class="card">
-        <div class="card-title">Appointment Request</div>
-        <p style="color: var(--secondary-color); font-size: 0.9rem; margin-bottom: 25px;">
-            Select your preferred physician and a suitable time slot. Our staff will review and confirm your request.
-        </p>
+        <div class="card-header">
+            <div class="card-title">Request Appointment</div>
+        </div>
+        <p class="text-secondary text-sm mb-lg">Select your preferred physician and time slot.</p>
 
         <form method="post">
             {% csrf_token %}
             <div class="form-group">
-                <label for="{{ form.doctor.id_for_label }}">Select Doctor</label>
+                <label class="form-label" for="{{ form.doctor.id_for_label }}">Select Doctor</label>
                 {{ form.doctor }}
-                {% if form.doctor.errors %}<div class="alert alert-danger">{{ form.doctor.errors }}</div>{% endif %}
+                {% if form.doctor.errors %}
+                <div class="form-error">{{ form.doctor.errors }}</div>
+                {% endif %}
             </div>
 
             <div class="form-group">
-                <label for="{{ form.scheduled_at.id_for_label }}">Proposed Date & Time</label>
+                <label class="form-label" for="{{ form.scheduled_at.id_for_label }}">Date & Time</label>
                 {{ form.scheduled_at }}
-                <p style="font-size: 0.75rem; color: var(--secondary-color);">Format: YYYY-MM-DD HH:MM (e.g., 2026-05-15
-                    14:30)</p>
-                {% if form.scheduled_at.errors %}<div class="alert alert-danger">{{ form.scheduled_at.errors }}</div>{% endif %}
+                <div class="form-hint">Format: YYYY-MM-DD HH:MM</div>
+                {% if form.scheduled_at.errors %}
+                <div class="form-error">{{ form.scheduled_at.errors }}</div>
+                {% endif %}
             </div>
 
             <div class="form-group">
-                <label for="{{ form.notes.id_for_label }}">Reason for Visit / Symptoms (Optional)</label>
+                <label class="form-label" for="{{ form.notes.id_for_label }}">Reason for Visit</label>
                 {{ form.notes }}
             </div>
 
-            <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px;">
-                <a href="{% url 'appointments:appointment_list' %}" class="btn"
-                    style="background: var(--bg-color);">Cancel</a>
-                <button type="submit" class="btn btn-primary">Submit Booking Request</button>
+            <div class="flex gap-sm" style="justify-content: flex-end;">
+                <a href="{% url 'appointments:appointment_list' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </form>
     </div>
 
-    <div class="card" style="background: #e7f3ff; border: none;">
-        <h4 style="color: var(--primary-color); margin-top: 0;">Need Urgent Help?</h4>
-        <p style="font-size: 0.85rem; margin-bottom: 0;">If this is a medical emergency, please visit the ER immediately
-            or contact your local emergency services.</p>
+    <div class="alert alert-info">
+        <strong>Need urgent help?</strong> For medical emergencies, please visit the ER or call emergency services.
     </div>
 </div>
 {% endblock %}

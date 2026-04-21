@@ -1,22 +1,25 @@
 {% extends 'base.html' %}
-{% block title %}Nurse Dashboard - OHMS{% endblock %}
-{% block page_title %}Nursing Oversight{% endblock %}
+{% block title %}Nurse Dashboard{% endblock %}
+{% block page_title %}Nursing Dashboard{% endblock %}
+
 {% block content %}
-<div class="card">
-    <h2>Nursing Dashboard</h2>
-    <p>Coordinate patient care, manage scan uploads, and assist in clinical operations.</p>
+<div class="page-title-block">
+    <h1 class="page-title">Welcome, {{ user.get_full_name|default:user.username }}</h1>
+    <p class="page-subtitle">Patient care and coordination</p>
 </div>
-<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-    <div class="card">
-        <h3>Patient Management</h3>
-        <p>Update vital signs or upload CT scans on behalf of patients.</p>
-        <a href="{% url 'patients:patient_list' %}" class="btn btn-primary">View Patients</a>
-        <a href="{% url 'diagnostics:upload_scan' %}" class="btn btn-success">Upload Scan</a>
-    </div>
-    <div class="card">
-        <h3>Department Schedule</h3>
-        <p>Monitor patient arrivals and appointment status.</p>
-        <a href="{% url 'appointments:appointment_list' %}" class="btn btn-primary">View Schedule</a>
-    </div>
+
+<div class="stats-grid">
+    <a href="{% url 'patients:patient_list' %}" class="stat-card" style="text-decoration: none;">
+        <div class="stat-label">Patients</div>
+        <div class="stat-value">Registry</div>
+    </a>
+    <a href="{% url 'appointments:appointment_list' %}" class="stat-card" style="text-decoration: none;">
+        <div class="stat-label">Appointments</div>
+        <div class="stat-value">View All</div>
+    </a>
+    <a href="{% url 'diagnostics:upload_scan' %}" class="stat-card" style="text-decoration: none;">
+        <div class="stat-label">Upload Scan</div>
+        <div class="stat-value">CT Imaging</div>
+    </a>
 </div>
 {% endblock %}

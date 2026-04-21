@@ -5,82 +5,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}OHMS - Hospital Management{% endblock %}</title>
+    <title>{% block title %}OHMS{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
 
 <body>
+    {% if user.is_authenticated %}
     <div class="app-container">
-        {% if user.is_authenticated %}
         <aside class="sidebar">
-            <div class="sidebar-header">OHMS</div>
+            <div class="sidebar-header">
+                OHMS
+            </div>
             <nav class="sidebar-nav">
-                <a href="{% url 'root' %}" class="nav-item">Dashboard</a>
+                <div class="nav-section">
+                    <div class="nav-section-title">Menu</div>
+                    <a href="{% url 'root' %}" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <polyline points="9 22 9 12 15 12 15 22"/>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="{% url 'notifications:list' %}" class="nav-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        Notifications
+                        {% if unread_count > 0 %}
+                        <span class="badge badge-danger" style="margin-left: auto;">{{ unread_count }}</span>
+                        {% endif %}
+                    </a>
+                </div>
+
                 {% if user.role == 'doctor' %}
-                <a href="{% url 'appointments:appointment_list' %}" class="nav-item">My Appointments</a>
-                <a href="{% url 'diagnostics:pending_reviews' %}" class="nav-item">Diagnostic Reviews</a>
-                <a href="{% url 'patients:patient_list' %}" class="nav-item">Patient Records</a>
+                <div class="nav-section">
+                    <div class="nav-section-title">Clinical</div>
+                    <a href="{% url 'appointments:appointment_list' %}" class="nav-item">Appointments</a>
+                    <a href="{% url 'diagnostics:pending_reviews' %}" class="nav-item">Diagnostic Reviews</a>
+                    <a href="{% url 'patients:patient_list' %}" class="nav-item">Patients</a>
+                </div>
                 {% elif user.role == 'nurse' %}
-                <a href="{% url 'patients:patient_list' %}" class="nav-item">Patient Records</a>
-                <a href="{% url 'appointments:appointment_list' %}" class="nav-item">All Appointments</a>
-                <a href="{% url 'diagnostics:upload_scan' %}" class="nav-item">Upload Scan</a>
+                <div class="nav-section">
+                    <div class="nav-section-title">Nursing</div>
+                    <a href="{% url 'patients:patient_list' %}" class="nav-item">Patients</a>
+                    <a href="{% url 'appointments:appointment_list' %}" class="nav-item">Appointments</a>
+                    <a href="{% url 'diagnostics:upload_scan' %}" class="nav-item">Upload Scan</a>
+                </div>
                 {% elif user.role == 'patient' %}
-                {% if user.patient_profile and user.patient_profile.pk %}
-                <a href="{% url 'patients:patient_detail' pk=user.patient_profile.pk %}" class="nav-item">My Health Record</a>
-                {% else %}
-                <a href="{% url 'patients:patient_edit' %}" class="nav-item">Complete My Profile</a>
-                {% endif %}
-                <a href="{% url 'appointments:appointment_list' %}" class="nav-item">My Appointments</a>
-                <a href="{% url 'appointments:book_appointment' %}" class="nav-item">Book Appointment</a>
-                <a href="{% url 'consultations:prescription_list' %}" class="nav-item">Prescriptions</a>
+                <div class="nav-section">
+                    <div class="nav-section-title">My Health</div>
+                    {% if user.patient_profile and user.patient_profile.pk %}
+                    <a href="{% url 'patients:patient_detail' pk=user.patient_profile.pk %}" class="nav-item">My Record</a>
+                    {% else %}
+                    <a href="{% url 'patients:patient_edit' %}" class="nav-item">Complete Profile</a>
+                    {% endif %}
+                    <a href="{% url 'appointments:appointment_list' %}" class="nav-item">Appointments</a>
+                    <a href="{% url 'appointments:book_appointment' %}" class="nav-item">Book Appointment</a>
+                    <a href="{% url 'diagnostics:scan_list' %}" class="nav-item">My Scans</a>
+                    <a href="{% url 'consultations:prescription_list' %}" class="nav-item">Prescriptions</a>
+                </div>
                 {% elif user.role == 'admin' %}
-                <a href="{% url 'admin_panel:dashboard' %}" class="nav-item">Admin Home</a>
-                <a href="{% url 'admin_panel:staff_list' %}" class="nav-item">Staff Registry</a>
-                <a href="{% url 'admin_panel:inventory_list' %}" class="nav-item">Inventory</a>
-                <a href="{% url 'admin_panel:audit_logs' %}" class="nav-item">System Logs</a>
-                <a href="{% url 'diagnostics:result_history' %}" class="nav-item">AI History</a>
+                <div class="nav-section">
+                    <div class="nav-section-title">Administration</div>
+                    <a href="{% url 'admin_panel:dashboard' %}" class="nav-item">Dashboard</a>
+                    <a href="{% url 'admin_panel:staff_list' %}" class="nav-item">Staff</a>
+                    <a href="{% url 'admin_panel:inventory_list' %}" class="nav-item">Inventory</a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">System</div>
+                    <a href="{% url 'admin_panel:audit_logs' %}" class="nav-item">Audit Logs</a>
+                    <a href="{% url 'diagnostics:result_history' %}" class="nav-item">AI History</a>
+                </div>
                 {% elif user.role == 'lab_tech' %}
-                <a href="{% url 'diagnostics:upload_scan' %}" class="nav-item">Upload CT Scan</a>
-                <a href="{% url 'diagnostics:scan_list' %}" class="nav-item">Recent Scans</a>
+                <div class="nav-section">
+                    <div class="nav-section-title">Laboratory</div>
+                    <a href="{% url 'diagnostics:upload_scan' %}" class="nav-item">Upload CT Scan</a>
+                    <a href="{% url 'diagnostics:scan_list' %}" class="nav-item">Recent Scans</a>
+                </div>
                 {% endif %}
             </nav>
         </aside>
-        {% endif %}
 
-        <div class="main-wrapper {% if not user.is_authenticated %}no-sidebar{% endif %}">
+        <div class="main-wrapper">
             <header class="top-navbar">
-                <div class="page-identity">
-                    <span style="font-weight: 500; color: var(--secondary-color);">{% block page_title %}{% endblock %}</span>
+                <div class="navbar-left">
+                    <span class="navbar-title">{% block page_title %}Dashboard{% endblock %}</span>
                 </div>
-                {% if user.is_authenticated %}
-                <div class="user-actions" style="display: flex; align-items: center;">
-                    <a href="{% url 'notifications:list' %}" class="notification-bell">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                            <path
-                                d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z" />
+                <div class="navbar-right">
+                    <a href="{% url 'notifications:list' %}" class="notification-link">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                         </svg>
-                        {% if unread_count > 0 %}<span class="badge-count">{{ unread_count }}</span>{% endif %}
+                        {% if unread_count > 0 %}
+                        <span class="notification-badge">{{ unread_count }}</span>
+                        {% endif %}
                     </a>
-                    <div class="user-info" style="margin-right: 20px;">
-                        <span style="font-size: 0.9rem; font-weight: 600;">{{ user.username }}</span>
-                        <span class="badge" style="background: #e9ecef; color: var(--primary-color);">{{user.get_role_display }}</span>
+                    <div class="user-menu">
+                        <div>
+                            <div class="user-name">{{ user.username }}</div>
+                            <div class="user-role">{{ user.get_role_display }}</div>
+                        </div>
                     </div>
-                    <form action="{% url 'accounts:logout' %}" method="post" style="display:inline;">
+                    <form action="{% url 'accounts:logout' %}" method="post">
                         {% csrf_token %}
-                        <button type="submit" class="btn"
-                            style="background: none; border: 1px solid var(--border-color); color: var(--secondary-color); padding: 5px 12px; font-size: 0.8rem;">Logout</button>
+                        <button type="submit" class="btn btn-ghost btn-sm">Logout</button>
                     </form>
                 </div>
-                {% endif %}
             </header>
 
             <main class="content-area">
                 {% if messages %}
-                <div id="messages">
+                <div class="messages">
                     {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}">
+                        {{ message }}
+                    </div>
                     {% endfor %}
                 </div>
                 {% endif %}
@@ -88,9 +133,15 @@
             </main>
         </div>
     </div>
+    {% else %}
+    <div class="auth-container">
+        {% block auth_content %}{% endblock %}
+    </div>
+    {% endif %}
+
     <script>
-        setTimeout(function () {
-            var msgs = document.getElementById('messages');
+        setTimeout(function() {
+            var msgs = document.querySelector('.messages');
             if (msgs) msgs.style.display = 'none';
         }, 5000);
     </script>

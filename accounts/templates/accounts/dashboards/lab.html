@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
-{% block title %}Lab Dashboard - OHMS{% endblock %}
-{% block page_title %}Imaging & Laboratory{% endblock %}
+{% block title %}Lab Dashboard{% endblock %}
+{% block page_title %}Laboratory{% endblock %}
+
 {% block content %}
-<div class="card">
-    <h2>Laboratory Technician Dashboard</h2>
-    <p>Manage diagnostic scans and laboratory imaging workflows.</p>
+<div class="page-title-block">
+    <h1 class="page-title">Welcome, {{ user.get_full_name|default:user.username }}</h1>
+    <p class="page-subtitle">Laboratory management</p>
 </div>
-<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
-    <div class="card">
-        <h3>New Scan Upload</h3>
-        <p>Process CT scans and trigger AI preprocessing.</p>
-        <a href="{% url 'diagnostics:upload_scan' %}" class="btn btn-primary">Upload DICOM/PNG</a>
-    </div>
-    <div class="card">
-        <h3>Recent Scans</h3>
-        <p>Monitor status of uploaded imaging.</p>
-        <a href="{% url 'diagnostics:scan_list' %}" class="btn btn-secondary">Scan Workspace</a>
-    </div>
+
+<div class="stats-grid">
+    <a href="{% url 'diagnostics:upload_scan' %}" class="stat-card" style="text-decoration: none;">
+        <div class="stat-label">Upload CT Scan</div>
+        <div class="stat-value">Submit</div>
+    </a>
+    <a href="{% url 'diagnostics:scan_list' %}" class="stat-card" style="text-decoration: none;">
+        <div class="stat-label">Recent Scans</div>
+        <div class="stat-value">View All</div>
+    </a>
 </div>
 {% endblock %}

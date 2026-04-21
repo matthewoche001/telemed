@@ -1,52 +1,55 @@
 {% extends 'base.html' %}
-{% block title %}Diagnostic Scans - OHMS{% endblock %}
-{% block page_title %}Imaging Workspace{% endblock %}
+{% block title %}CT Scans{% endblock %}
+{% block page_title %}Diagnostic Imaging{% endblock %}
 
 {% block content %}
-<div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-        <h3>Diagnostic Imaging Records</h3>
-        {% if user.role != 'patient' %}
-        <a href="{% url 'diagnostics:upload_scan' %}" class="btn btn-primary">+ New Upload</a>
-        {% endif %}
-    </div>
+<div class="flex justify-between items-center mb-md">
+    <h1 class="page-title" style="margin: 0;">CT Scans</h1>
+    {% if user.role != 'patient' %}
+    <a href="{% url 'diagnostics:upload_scan' %}" class="btn btn-primary">Upload Scan</a>
+    {% endif %}
+</div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Upload Date</th>
-                <th>Patient</th>
-                <th>Uploaded By</th>
-                <th>Analysis Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for scan in scans %}
-            <tr>
-                <td>{{ scan.upload_timestamp|date:"Y-m-d H:i" }}</td>
-                <td>{{ scan.patient.username }}</td>
-                <td>{{ scan.uploaded_by.username }}</td>
-                <td>
-                    {% if scan.status == 'analyzed' %}<span class="badge"
-                        style="background:var(--primary-color); color:#fff;">Analyzed</span>
-                    {% elif scan.status == 'validated' %}<span class="badge badge-confirmed">Validated</span>
-                    {% elif scan.status == 'failed' %}<span class="badge"
-                        style="background:var(--danger); color:#fff;">Failed</span>
-                    {% else %}<span class="badge badge-pending">{{ scan.status|capfirst }}</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'diagnostics:scan_detail' scan.pk %}" class="btn"
-                        style="background:#e9ecef; padding: 5px 12px; font-size: 0.8rem;">View Detailed Result</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" style="text-align: center;">No imaging records found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="card" style="padding: 0;">
+    <div class="table-container" style="border: none; border-radius: 0;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Patient</th>
+                    <th>Uploaded By</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for scan in scans %}
+                <tr>
+                    <td class="text-sm">{{ scan.upload_timestamp|date:"M d, Y H:i" }}</td>
+                    <td>{{ scan.patient.username }}</td>
+                    <td class="text-sm">{{ scan.uploaded_by.username }}</td>
+                    <td>
+                        {% if scan.status == 'analyzed' %}
+                        <span class="badge badge-primary">Analyzed</span>
+                        {% elif scan.status == 'validated' %}
+                        <span class="badge badge-success">Validated</span>
+                        {% elif scan.status == 'failed' %}
+                        <span class="badge badge-danger">Failed</span>
+                        {% else %}
+                        <span class="badge badge-neutral">{{ scan.status|capfirst }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'diagnostics:scan_detail' scan.pk %}" class="btn btn-ghost btn-sm">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-muted" style="text-align: center; padding: var(--space-xl);">No scans found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
